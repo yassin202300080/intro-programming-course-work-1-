@@ -9,6 +9,11 @@ def encode_message(image_path, message):
     message += '\0'
     msg_bytes = bytearray(message, 'utf-8')
 
+    # Error handling that Excludes the BMP header
+    if len(msg_bytes) * 8 > len(data) - 54:  
+        raise ValueError("The message is too long to hide in this image.")
+
+
     # Embed the message
     for i in range(len(msg_bytes)):
         for bit in range(8):
