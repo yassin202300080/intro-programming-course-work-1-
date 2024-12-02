@@ -4,7 +4,11 @@ def encode_message(image_path, message, output_path):
     # Read the BMP file
     with open(image_path, 'rb') as img:
         data = bytearray(img.read())
-
+        
+    #error handling that checks if the file is  BMP
+    if data[:2] != b'BM':
+        raise ValueError("invalid file path type")
+    
     # add a null terminator to the end of the message
     message += '\0'
     msg_bytes = bytearray(message, 'utf-8')
@@ -17,14 +21,14 @@ def encode_message(image_path, message, output_path):
     # Embed the message
     for i in range(len(msg_bytes)):
         for bit in range(8):
-            idx = 54 + i * 8 + bit
+            idx = 54 + i * 8 + bit 
             data[idx] = (data[idx] & 0xFE) | ((msg_bytes[i] >> (7 - bit)) & 0x01)
 
     # output to a new file
     with open(output_path, 'wb') as output:
         output.write(data)
 
-    print("Message successfully hidden in 'Hidden msg.bmp'")
+    print("Message successfully hidden in ")
 
 def decode_message(image_path):
     #Read the BMP file 
@@ -49,16 +53,23 @@ def decode_message(image_path):
     return hidden_msg
 
 if __name__ == "__main__":
-    img_path = input("Enter the BMP image path: ")
-    output_img_path = "Hidden msg.bmp"
-    secret_msg = input("Enter the message to hide: ")
+    try:
+        img_path = input("Enter the BMP image path: ")
+        output_img_path = "Hidden msg.bmp"
+        secret_msg = input("Enter the message to hide: ")
 
-    # Hide the message in the BMP file
-    encode_message(img_path, secret_msg, output_img_path)
+        # Hide the message in the BMP file
+        encode_message(img_path, secret_msg, output_img_path)
 
-     # Decode and verify the hidden message
-    decoded_message = decode_message(output_img_path)
-    print(f"Decoded message: {decoded_message}")
+        # Decode and verify the hidden message
+        decoded_message = decode_message(output_img_path)
+        print(f"Decoded message: {decoded_message}")
+    
+    except FileNotFoundError:
+        print("Invalid image path")
+
+
+
     
 
 
